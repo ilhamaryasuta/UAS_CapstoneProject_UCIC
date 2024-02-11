@@ -213,12 +213,10 @@ class _LoginPageState extends State<LoginPage> {
       } catch (e) {
         debugPrint('$e');
       }
-      debugPrint('No user found for that email.');
       if (context.mounted) {
-        //show snackbar for no user found
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('No user found for that email.'),
+            content: Text('Email/password salah!'),
           ),
         );
       }
