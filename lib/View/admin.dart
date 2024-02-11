@@ -101,7 +101,38 @@ class _AdminState extends State<Admin> {
                                       children: [
                                         SlidableAction(
                                           onPressed: (context) {
-                                            Pegawai().hapusPegawai(UserModel(id: records.id, nama: null, posisi: null, gajipokok: null, uangmakan: null, izin: null, rool: null));
+                                            showDialog(
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                return AlertDialog(
+                                                  title: const Text('Konfirmasi'),
+                                                  content: const Text('Apakah anda yakin ingin menghapus data karyawan ini?'),
+                                                  actions: [
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        Navigator.of(context).pop();
+                                                        Pegawai().hapusPegawai(UserModel(
+                                                          id: records.id,
+                                                          nama: null,
+                                                          posisi: null,
+                                                          gajipokok: null,
+                                                          uangmakan: null,
+                                                          izin: null,
+                                                          rool: null,
+                                                        ));
+                                                      },
+                                                      child: Text('Confirm'),
+                                                    ),
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        Navigator.of(context).pop();
+                                                      },
+                                                      child: Text('Cancel'),
+                                                    ),
+                                                  ],
+                                                );
+                                              },
+                                            );
                                           },
                                           icon: Icons.delete_outline,
                                           backgroundColor: Colors.redAccent,
