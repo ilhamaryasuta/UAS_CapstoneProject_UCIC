@@ -126,7 +126,7 @@ class _LoginPageState extends State<LoginPage> {
                           onSaved: (value) {
                             passwordController.text = value!;
                           },
-                          keyboardType: TextInputType.emailAddress,
+                          keyboardType: TextInputType.visiblePassword,
                         ),
                         const SizedBox(
                           height: 20,
@@ -135,11 +135,16 @@ class _LoginPageState extends State<LoginPage> {
                           shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20.0))),
                           elevation: 5.0,
                           height: 40,
-                          onPressed: () {
+                          onPressed: () async {
                             setState(() {
                               visible = true;
                             });
-                            signIn(emailController.text, passwordController.text);
+                            bool success = await signIn(emailController.text, passwordController.text);
+                            if (!success) {
+                              setState(() {
+                                visible = false;
+                              });
+                            }
                           },
                           color: Colors.white,
                           child: const Text(
@@ -190,8 +195,10 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  void signIn(String email, String password) async {
+  Future<bool> signIn(String email, String password) async {
     if (_formkey.currentState!.validate()) {
+      _formkey.currentState!.save();
+      debugPrint("$email dan $password");
       try {
         UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: email,
@@ -201,14 +208,23 @@ class _LoginPageState extends State<LoginPage> {
         var documents = await FirebaseFirestore.instance.collection('users').doc(user!.uid).get();
         if (documents.exists) {
           route(documents.data() as Map<String, dynamic>);
+          return true;
         }
-      } on FirebaseAuthException catch (e) {
-        if (e.code == 'user-not-found') {
-          debugPrint('No user found for that email.');
-        } else if (e.code == 'wrong-password') {
-          debugPrint('Wrong password provided for that user.');
-        }
+      } catch (e) {
+        debugPrint('$e');
       }
+      debugPrint('No user found for that email.');
+      if (context.mounted) {
+        //show snackbar for no user found
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('No user found for that email.'),
+          ),
+        );
+      }
+      emailController.clear();
+      passwordController.clear();
     }
+    return false;
   }
 }
