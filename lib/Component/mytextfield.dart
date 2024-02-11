@@ -1,16 +1,22 @@
 import 'package:flutter/material.dart';
 
 class Mytextfield extends StatelessWidget {
-  final labeltext, hintedtext;
+  final String labeltext, hintedtext;
   final TextEditingController mycontroller;
+  final bool isRequired, allowEdit;
 
-  const Mytextfield({super.key, required this.labeltext, required this.hintedtext, required this.mycontroller});
+  const Mytextfield({super.key, required this.labeltext, required this.hintedtext, required this.mycontroller, this.isRequired = true, this.allowEdit = true});
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      enableInteractiveSelection: allowEdit,
+      readOnly: !allowEdit,
       controller: mycontroller,
       validator: (value) {
+        if (!isRequired) {
+          return null;
+        }
         if (value!.isEmpty) {
           return "$labeltext Wajib di isi";
         } else {

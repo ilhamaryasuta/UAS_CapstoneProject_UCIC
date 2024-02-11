@@ -18,18 +18,18 @@ class UserModel {
       "gajipokok": gajipokok,
       "uangmakan": uangmakan,
       "izin": izin,
-      "rool": "karyawan"
+      "rool": "karyawan",
     };
   }
 
-  Map<String, dynamic> add_data() {
+  Map<String, dynamic> addData() {
     return {
       "nama": nama,
       "posisi": posisi,
       "gajipokok": gajipokok,
       "uangmakan": uangmakan,
       "izin": izin,
-      "rool": "karyawan"
+      "rool": "karyawan",
     };
   }
 }

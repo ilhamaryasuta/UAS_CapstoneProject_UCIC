@@ -4,18 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:projectuas/Controller/pegawai.dart';
 import 'package:projectuas/Model/modelpegawai.dart';
 import 'package:projectuas/View/editpegawai.dart';
-import 'login.dart';
+import 'package:projectuas/View/login.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:logger/logger.dart';
 
-class Teacher extends StatefulWidget {
-  const Teacher({super.key});
+class Admin extends StatefulWidget {
+  const Admin({super.key});
 
   @override
-  State<Teacher> createState() => _TeacherState();
+  State<Admin> createState() => _AdminState();
 }
 
-class _TeacherState extends State<Teacher> {
+class _AdminState extends State<Admin> {
   late CollectionReference _pegawai;
   late Query _karyawan;
   final Logger logger = Logger();
@@ -33,6 +33,11 @@ class _TeacherState extends State<Teacher> {
         appBar: AppBar(
           title: const Text("Admin"),
           actions: [
+            IconButton(
+                onPressed: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => const Managepgw()));
+                },
+                icon: const Icon(Icons.add)),
             IconButton(
               onPressed: () {
                 logout(context);
@@ -96,7 +101,7 @@ class _TeacherState extends State<Teacher> {
                                       children: [
                                         SlidableAction(
                                           onPressed: (context) {
-                                            Pegawai().hapus_pegawai(UserModel(id: records.id, nama: null, posisi: null, gajipokok: null, uangmakan: null, izin: null, rool: null));
+                                            Pegawai().hapusPegawai(UserModel(id: records.id, nama: null, posisi: null, gajipokok: null, uangmakan: null, izin: null, rool: null));
                                           },
                                           icon: Icons.delete_outline,
                                           backgroundColor: Colors.redAccent,

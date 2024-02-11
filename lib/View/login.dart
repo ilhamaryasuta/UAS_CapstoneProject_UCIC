@@ -1,15 +1,14 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
-import 'admin.dart';
-import 'karyawan.dart';
+import 'package:projectuas/View/admin.dart';
+import 'package:projectuas/View/karyawan.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
   @override
-  _LoginPageState createState() => _LoginPageState();
+  State<LoginPage> createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
@@ -19,7 +18,6 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
-  final _auth = FirebaseAuth.instance;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -159,10 +157,9 @@ class _LoginPageState extends State<LoginPage> {
                             maintainAnimation: true,
                             maintainState: true,
                             visible: visible,
-                            child: Container(
-                                child: const CircularProgressIndicator(
+                            child: const CircularProgressIndicator(
                               color: Colors.white,
-                            ))),
+                            )),
                       ],
                     ),
                   ),
@@ -175,29 +172,22 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  void route() {
-    User? user = FirebaseAuth.instance.currentUser;
-    var kk = FirebaseFirestore.instance.collection('users').doc(user!.uid).get().then((DocumentSnapshot documentSnapshot) {
-      if (documentSnapshot.exists) {
-        if (documentSnapshot.get('rool') == "admin") {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const Teacher(),
-            ),
-          );
-        } else {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const Student(),
-            ),
-          );
-        }
-      } else {
-        print('Document does not exist on the database');
-      }
-    });
+  void route(Map<String, dynamic> userData) {
+    if (userData['rool'] == "admin") {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const Admin(),
+        ),
+      );
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => Karyawan(userData: userData),
+        ),
+      );
+    }
   }
 
   void signIn(String email, String password) async {
@@ -207,12 +197,16 @@ class _LoginPageState extends State<LoginPage> {
           email: email,
           password: password,
         );
-        route();
+        User? user = userCredential.user;
+        var documents = await FirebaseFirestore.instance.collection('users').doc(user!.uid).get();
+        if (documents.exists) {
+          route(documents.data() as Map<String, dynamic>);
+        }
       } on FirebaseAuthException catch (e) {
         if (e.code == 'user-not-found') {
-          print('No user found for that email.');
+          debugPrint('No user found for that email.');
         } else if (e.code == 'wrong-password') {
-          print('Wrong password provided for that user.');
+          debugPrint('Wrong password provided for that user.');
         }
       }
     }

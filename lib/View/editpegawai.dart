@@ -1,5 +1,3 @@
-//import 'dart:ffi';
-
 import 'package:projectuas/Component/mytextfield.dart';
 import 'package:projectuas/Controller/pegawai.dart';
 import 'package:projectuas/Model/modelpegawai.dart';
@@ -7,14 +5,14 @@ import 'package:flutter/material.dart';
 
 class Managepgw extends StatefulWidget {
   final UserModel? mpegawai;
-  final index;
+  final int? index;
   const Managepgw({super.key, this.mpegawai, this.index});
   @override
   State<Managepgw> createState() => _ManagepgwState();
 }
 
 class _ManagepgwState extends State<Managepgw> {
-  final _form_key = GlobalKey<FormState>();
+  final _formKey = GlobalKey<FormState>();
 
   bool iseditingmode = false;
   final TextEditingController id = TextEditingController();
@@ -60,7 +58,7 @@ class _ManagepgwState extends State<Managepgw> {
                         style: TextStyle(fontSize: 28),
                       )
                     : const Text(
-                        "Tambah Mahasiswa",
+                        "Tambah Pegawai",
                         style: TextStyle(fontSize: 28),
                       ),
               ),
@@ -68,7 +66,7 @@ class _ManagepgwState extends State<Managepgw> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 15),
                 child: Form(
-                    key: _form_key,
+                    key: _formKey,
                     child: Column(
                       children: [
                         Mytextfield(labeltext: "NAMA", hintedtext: "Isi Nama Pegawai", mycontroller: nama),
@@ -79,9 +77,9 @@ class _ManagepgwState extends State<Managepgw> {
                         const SizedBox(height: 10),
                         Mytextfield(labeltext: "UANG MAKAN", hintedtext: "Isi Uang Makan Pegawai", mycontroller: uangmakan),
                         const SizedBox(height: 10),
-                        Mytextfield(labeltext: "EMAIL", hintedtext: "Isi Email Pegawai", mycontroller: email),
+                        Mytextfield(labeltext: "EMAIL", hintedtext: "Isi Email Pegawai", mycontroller: email, isRequired: !iseditingmode),
                         const SizedBox(height: 10),
-                        Mytextfield(labeltext: "PASSWORD", hintedtext: "Isi Password Pegawai", mycontroller: password),
+                        Mytextfield(labeltext: "PASSWORD", hintedtext: "Isi Password Pegawai", mycontroller: password, isRequired: !iseditingmode),
                         const SizedBox(height: 10),
                       ],
                     )),
@@ -89,13 +87,23 @@ class _ManagepgwState extends State<Managepgw> {
               const SizedBox(height: 10),
               ElevatedButton(
                 onPressed: () {
-                  _form_key.currentState!.save();
-
-                  if (iseditingmode == true) {
-                    debugPrint('halo');
-                    Pegawai().update_pegawai(UserModel(id: id.text, nama: nama.text, posisi: posisi.text, gajipokok: int.tryParse(gajipokok.text), uangmakan: int.tryParse(uangmakan.text), izin: int.tryParse(izin.text), rool: "karyawan"));
+                  _formKey.currentState!.save();
+                  if (_formKey.currentState!.validate()) {
+                    if (iseditingmode == true) {
+                      debugPrint('halo');
+                      Pegawai().updatePegawai(UserModel(id: id.text, nama: nama.text, posisi: posisi.text, gajipokok: int.tryParse(gajipokok.text), uangmakan: int.tryParse(uangmakan.text), izin: int.tryParse(izin.text), rool: "karyawan"));
+                      if (email.text.isNotEmpty) {
+                        Pegawai().updateEmail(id.text, email.text);
+                      }
+                      if (password.text.isNotEmpty) {
+                        Pegawai().updatePassword(id.text, password.text);
+                      }
+                      Navigator.pop(context);
+                    } else {
+                      Pegawai().addPegawai(UserModel(id: id.text, nama: nama.text, posisi: posisi.text, gajipokok: int.tryParse(gajipokok.text), uangmakan: int.tryParse(uangmakan.text), izin: int.tryParse(izin.text), rool: "karyawan", email: email.text, password: password.text));
+                      Navigator.pop(context);
+                    }
                   }
-                  Navigator.pop(context);
                 },
                 child: iseditingmode == true ? const Text("Update") : const Text("Save"),
               )
